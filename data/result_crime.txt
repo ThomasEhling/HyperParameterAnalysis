@@ -1,0 +1,31 @@
+loss   opt   metric   epochs   batch_size   mae
+mean_squared_error   rmsprop   mae   50   1   0.10046065195250474
+mean_absolute_error   rmsprop   mae   50   1   0.0931244062137174
+logcosh   rmsprop   mae   50   1   0.10108523902287678
+<function huber_loss at 0x7f3a557cf1e0>   rmsprop   mae   50   1   0.09639699566163427
+
+---
+loss   opt   metric   epochs   batch_size   mae
+<function huber_loss at 0x7fb79c7c71e0>   SGD   mae   50   1   0.09763676524862974
+<function huber_loss at 0x7fb79c7c71e0>   rmsprop   mae   50   1   0.09987740052811404
+<function huber_loss at 0x7fb79c7c71e0>   Adagrad   mae   50   1   0.10475323565280922
+<function huber_loss at 0x7fb79c7c71e0>   Adam   mae   50   1   0.09552480519798856
+
+---
+loss   opt   metric   epochs   batch_size   mae
+<function huber_loss at 0x7f2423d7d1e0>   Adam   mae   50   1   0.1755374186441629 L2 1
+<function huber_loss at 0x7f2423d7d1e0>   Adam   mae   50   1   0.17312735126450143 L2 0.1
+<function huber_loss at 0x7f2423d7d1e0>   Adam   mae   50   1   0.12496511331032437 L2 0.01
+<function huber_loss at 0x7f2423d7d1e0>   Adam   mae   50   1   0.09454084980100112 L2 0.001
+<function huber_loss at 0x7f37641e31e0>   Adam   mae   50   1   0.09426881752756416 L2 0.0001
+
+
+---
+loss   opt   metric   epochs   batch_size   mae
+<function huber_loss at 0x7f78175280d0>   Adam   mae   50   1   0.09813523426838802 DropOut 0.2
+<function huber_loss at 0x7f78175280d0>   Adam   mae   50   1   0.11199997028563652 DropOut 0.3
+<function huber_loss at 0x7f78175280d0>   Adam   mae   50   1   0.11976749522372099 DropOut 0.4
+<function huber_loss at 0x7f78175280d0>   Adam   mae   50   1   0.11228825491166974 DropOut 0.5
+---
+loss   opt   metric   epochs   batch_size   mae
+<function huber_loss at 0x7f536db26158>   Adam   mae   50   1   71.12431900329352 BN

@@ -1,0 +1,20 @@
+
+---
+loss_fct   opt   epochs   batch_size  title  loss   accuracy
+hinge   adam   40   12   hinge   41.34   83.6
+squared_hinge   adam   40   12   squared_hinge   52.94   82.05
+kullback_leibler_divergence   adam   40   12   kullback_leibler_divergence   63.65   66.66
+categorical_crossentropy   adam   40   12   categorical_crossentropy   42.97   82.3
+categorical_crossentropy   SGD   40   12   SGD   41.01   83.72
+categorical_crossentropy   RMSprop   40   12   RMSprop   46.01   82.97
+categorical_crossentropy   Adagrad   40   12   Adagrad   38.43   83.92
+categorical_crossentropy   Adam   40   12   Adam   41.57   83.13
+categorical_crossentropy   Adam   40   12   L2_1   67.75   66.66
+categorical_crossentropy   Adam   40   12   L2_2   64.06   66.66
+categorical_crossentropy   Adam   40   12   L2_3   48.79   79.85
+categorical_crossentropy   Adam   40   12   L2_4   45.1   82.31
+categorical_crossentropy   Adam   40   12   DropOut_0.2   43.67   81.62
+categorical_crossentropy   Adam   40   12   DropOut_0.3   48.23   78.86
+categorical_crossentropy   Adam   40   12   DropOut_0.4   48.16   78.62
+categorical_crossentropy   Adam   40   12   DropOut_0.5   55.49   72.02
+categorical_crossentropy   Adam   40   12   BN   42.53   80.63

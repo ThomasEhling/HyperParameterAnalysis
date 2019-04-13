@@ -1,0 +1,637 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>as3_code</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__left">
+    <div class="stackedit__toc">
+      
+<ul>
+<li><a href="#hyper-parameters-implementation-and-results">Hyper parameters, Implementation and results</a>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#implementation-details">implementation details</a></li>
+<li><a href="#i.-cifar10-dataset">I. CIFAR10 Dataset</a></li>
+<li><a href="#ii.-uci-crime-dataset">II. UCI Crime Dataset</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="stackedit__right">
+    <div class="stackedit__html">
+      <h1 id="hyper-parameters-implementation-and-results">Hyper parameters, Implementation and results</h1>
+<pre><code>- Thomas Ehling A20432671
+</code></pre>
+<h2 id="abstract">Abstract</h2>
+<p>With the library Keras and the programming language python, 2 differents Neural Network will be implemented on 2 specific datasets, and we will analyze the effect of the differents hyper parameters.</p>
+<h2 id="implementation-details">implementation details</h2>
+<p>The link to all the data files are in the “data.txt” file. You can also find these links here :</p>
+<ul>
+<li>cifar_10 : no link, loaded from keras</li>
+<li>crimebase.data :<br>
+<a href="https://drive.google.com/file/d/1e78DPbXmsSpKUfVnJ86axQHZc_pSODO3/view?usp=sharing">https://drive.google.com/file/d/1e78DPbXmsSpKUfVnJ86axQHZc_pSODO3/view?usp=sharing</a></li>
+</ul>
+<p>All python files are named “as1_” + the name of the corresponding dataset.</p>
+<p><strong>FOR LOADING THE ATA :</strong><br>
+Each program has his own arguments :</p>
+<ul>
+<li><strong>CIFAR10</strong> :  No arguments needed</li>
+<li></li>
+<li><strong>Crime</strong> : 1 argument : <strong>Path to the file crimebase.data</strong><br>
+If no data path given, an error will be generated !</li>
+</ul>
+<p>Each program will produced a “result_”+name of the dataset+".txt".<br>
+This file is a log file with all the final metrics. It can be found complete in the folder data.</p>
+<h2 id="i.-cifar10-dataset">I. CIFAR10 Dataset</h2>
+<h3 id="i.a-proposed-solution">I.A Proposed solution</h3>
+<h4 id="data-preparation">Data preparation</h4>
+<p>The 3 selected class are “Airplane”, “Automobile” and “Ship” (0,1,8), so the data can still be related in a way it would be in a real-life project.</p>
+<p>The data set is loaded with a training and testing data-set. These data-sets are processed to keep only the selected classes.</p>
+<p>Then the function <em>split-data</em> split the training data into a training set (4/5) and a validation set (1/5).</p>
+<p>At this step, here is the size of the datasets :</p>
+<ul>
+<li>training : 12 000</li>
+<li>validation : 3 000</li>
+<li>testing : 3 000</li>
+</ul>
+<p>Vectorizing of the images:</p>
+<pre class=" language-python"><code class="prism  language-python">train_img <span class="token operator">=</span> train_img<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> NB_FEATURES<span class="token punctuation">)</span>  
+test_img <span class="token operator">=</span> test_img<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> NB_FEATURES<span class="token punctuation">)</span>  
+  
+train_img <span class="token operator">=</span> train_img<span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token string">"float32"</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">255</span>  
+test_img <span class="token operator">=</span> test_img<span class="token punctuation">.</span>astype<span class="token punctuation">(</span><span class="token string">"float32"</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">255</span>
+</code></pre>
+<p>Encoding of the class labels :</p>
+<pre class=" language-python"><code class="prism  language-python">train_labels <span class="token operator">=</span> keras<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>to_categorical<span class="token punctuation">(</span>train_labels<span class="token punctuation">)</span>  
+val_labels <span class="token operator">=</span> keras<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>to_categorical<span class="token punctuation">(</span>val_labels<span class="token punctuation">)</span>  
+test_labels <span class="token operator">=</span> keras<span class="token punctuation">.</span>utils<span class="token punctuation">.</span>to_categorical<span class="token punctuation">(</span>test_labels<span class="token punctuation">)</span>
+</code></pre>
+<p>Shape at the end of the preprocessing :</p>
+<ul>
+<li>training images : (12000, 3072)</li>
+<li>training labels : (12000, 3)</li>
+<li>validation images : (3000, 3072)</li>
+<li>validation labels : (3000, 3)</li>
+<li>testing images : (3000, 3072)</li>
+<li>testing images : (3000, 3)</li>
+</ul>
+<h4 id="model-architecture">Model Architecture</h4>
+<p>Here is the model architecture :</p>
+<pre class=" language-python"><code class="prism  language-python">model <span class="token operator">=</span> models<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span><span class="token punctuation">)</span>  
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>  
+    layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">512</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">,</span> input_shape<span class="token operator">=</span><span class="token punctuation">(</span>train_data<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> kernel_regularizer<span class="token operator">=</span>dense_regularizer<span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token comment"># model.add(layers.Flatten())  </span>
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">,</span> kernel_regularizer<span class="token operator">=</span>dense_regularizer<span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token comment"># model.add(BatchNormalization())  </span>
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>Dropout<span class="token punctuation">(</span>drop<span class="token punctuation">)</span><span class="token punctuation">)</span> 
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">,</span> kernel_regularizer<span class="token operator">=</span>dense_regularizer<span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token comment"># model.add(BatchNormalization())  </span>
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>Dropout<span class="token punctuation">(</span>drop<span class="token punctuation">)</span><span class="token punctuation">)</span> 
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">,</span> kernel_regularizer<span class="token operator">=</span>dense_regularizer<span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token comment"># model.add(BatchNormalization())  </span>
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>Dropout<span class="token punctuation">(</span>drop<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span>NB_CLASS<span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'softmax'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+  
+model<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span>loss<span class="token operator">=</span>loss_fct<span class="token punctuation">,</span>  
+              <span class="token comment"># model.compile(loss='sparse_categorical_crossentropy',  </span>
+  optimizer<span class="token operator">=</span>opt<span class="token punctuation">,</span>  
+              metrics<span class="token operator">=</span><span class="token punctuation">[</span>metric<span class="token punctuation">]</span><span class="token punctuation">)</span>
+</code></pre>
+<p>with these values set by default :</p>
+<pre class=" language-python"><code class="prism  language-python">loss_fct <span class="token operator">=</span> <span class="token string">"categorical_crossentropy"</span>  
+opt <span class="token operator">=</span> <span class="token string">"Adam"</span>  
+batch_size <span class="token operator">=</span> <span class="token number">12</span>  
+epochs <span class="token operator">=</span> <span class="token number">40</span>
+dense_regularizer <span class="token operator">=</span> <span class="token boolean">None</span>  
+drop <span class="token operator">=</span> <span class="token number">0</span>
+</code></pre>
+<p>To assess the value of the final accuracy, a random function has been run and reported an accuracy of 33%.</p>
+<h3 id="hyperparameter-tuning">HyperParameter tuning</h3>
+<h4 id="loss-functions">1.  loss functions</h4>
+<p>It is a model for single output regression, so the loss functions we can use are :<br>
+“hinge”<br>
+“squared_hinge”<br>
+“kullback_leibler_divergence”<br>
+“categorical_crossentropy”</p>
+<p>Here are the resulting loss by epochs :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">hinge</th>
+<th align="center">squared_hinge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/DZuhzLe.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/eslsBSP.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">kullback_leibler_divergence</th>
+<th align="center">categorical_crossentropy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/BVkyk9d.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/LxnYvuG.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>Here are the resulting accuracy by epochs :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">hinge</th>
+<th align="center">squared_hinge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/R7UNXoQ.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/ZfHmUgB.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">kullback_leibler_divergence</th>
+<th align="center">categorical_crossentropy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/iyj5mlW.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/ZAAYeUK.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>And the final accuracy by loss function :<br>
+“hinge”  :  83.6<br>
+“squared_hinge”  : 82.05<br>
+“kullback_leibler_divergence”  : 66.66<br>
+“categorical_crossentropy” : 82.3</p>
+<p>Except for the Kullback_Lieber that has a lower accuracy, the final values does not change much, but the impacts of the loss functions on the graphs really are according to the theory.</p>
+<p>I kept categorical crossentropy for the remaining test, as the loss function on the graphs is smoother than hinge (we need that to analyze the impact of the next hyper parameters tuning) and the final accuracy is still high.</p>
+<h4 id="optimizers">2.  optimizers</h4>
+<p>We have 4 different optimizers :<br>
+SGD<br>
+RMSProp<br>
+AdaGrad<br>
+Adam</p>
+<p>Here are the resulting loss by epoch :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">SGD</th>
+<th align="center">RMSProp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/RAp5zO1.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/2XCrrli.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">AdaGrad</th>
+<th align="center">Adam</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/XLyyDzG.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/XJEUTZg.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>Here are the resulting accuracy by epoch :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">SGD</th>
+<th align="center">RMSProp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/DD7Vwgb.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/02bgMXM.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">AdaGrad</th>
+<th align="center">Adam</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/VZl8v5U.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/BZtSRrF.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>And the final accuracy by optimizers :<br>
+SGD : 83.72<br>
+RMSProp : 82.97<br>
+AdaGrad : 83.92<br>
+Adam : 83.13</p>
+<p>We can notice that the loss functions on the graph react as it is supposed to be : The SGD and Adam are similar and smoother, Adagrad is not noisy at all, and RMSProp is noisy.</p>
+<p>We can notice the impact of the optimizers too, as the accuracy values are higher than before.</p>
+<h4 id="regularization-l2">3.  Regularization l2</h4>
+<p>For the L2 reguralization, I tested with the values : 0.1, 0.01, 0.001, 0.0001</p>
+<p>Here are the resulting loss by epochs :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">L2(0.1)</th>
+<th align="center">L2(0.01)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/U95yKnE.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/BrFsDKL.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">L2(0.001)</th>
+<th align="center">L2(0.0001)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/Dp0cVqI.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/Uwr74pV.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>Here are the resulting accuracy by epochs :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">L2(0.1)</th>
+<th align="center">L2(0.01)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/qWt5NRZ.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/wt6z0Ug.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">L2(0.001)</th>
+<th align="center">L2(0.0001)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/5m3YnZP.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/uGpdqCi.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>And the final accuracy by value :<br>
+L2(0.1) : 66.66<br>
+L2(0.01) : 66.66<br>
+L2(0.001) : 79.85<br>
+L2(0.0001) : 82.31</p>
+<p>As expected, we can notice that the higher value of L2 are too high, introduce noice and lower the accuracy where the best value for L2 reguralization is 0.0001, as the curve is smooth and the final accuracy is the smallest.</p>
+<h4 id="dropout">3.  Dropout</h4>
+<p>For the Dropout, I tested with the drop rate : 0.2, 0.3, 0.4, 0.5</p>
+<p>Here are the resulting loss by epochs:</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dropout(0.2)</th>
+<th align="center">Dropout(0.3)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/Wpu6UGd.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/bcg2ohC.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">Dropout(0.4)</th>
+<th align="center">Dropout(0.5)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/dkcgzi0.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/dQIFk7F.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>Here are the resulting accuracy by epochs:</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dropout(0.2)</th>
+<th align="center">Dropout(0.3)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/0Zf4SBZ.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/WvQL0Hm.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">Dropout(0.4)</th>
+<th align="center">Dropout(0.5)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/MiHz4s5.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/smwEMHD.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>And the final accuracy by drop rate :<br>
+DropOut 0.2 : 81.62<br>
+DropOut 0.3 : 78.86<br>
+DropOut 0.4 : 78.62<br>
+DropOut 0.5 : 72.02</p>
+<p>We can see that the best drop rate here is 20%. The curve is the smoothe and the final accuracy is the smallest. However we can notice that the accuracy is lower than before. That can be due to the small size of the data-set.</p>
+<h4 id="batch-normalization">4.  Batch Normalization</h4>
+<p>Here is a simplified version of my model architecture to show where the btach normalization is being done.</p>
+<pre class=" language-python"><code class="prism  language-python">model <span class="token operator">=</span> models<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span><span class="token punctuation">)</span>  
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">512</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">128</span><span class="token punctuation">)</span>  
+<span class="token operator">-</span><span class="token operator">-</span><span class="token operator">&gt;</span> model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>BatchNormalization<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token operator">-</span><span class="token operator">-</span><span class="token operator">&gt;</span> model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>BatchNormalization<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token operator">-</span><span class="token operator">-</span><span class="token operator">&gt;</span> model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>BatchNormalization<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span>NB_CLASS<span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'softmax'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+  
+model<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span>loss<span class="token operator">=</span>loss_fct<span class="token punctuation">,</span> optimizer<span class="token operator">=</span>opt<span class="token punctuation">,</span> metrics<span class="token operator">=</span><span class="token punctuation">[</span>metric<span class="token punctuation">]</span><span class="token punctuation">)</span>
+</code></pre>
+<p>Resulting loss:<br>
+<img src="https://imgur.com/JhInMV8.png" alt=" BN "></p>
+<p>Resulting accuracy :<br>
+<img src="https://imgur.com/kmXeBg6.png" alt=" BN "></p>
+<p>Final Accuracy : 80.63</p>
+<p>The final value, high still, remain lower than the others. It may be cause the batches we are using a too small to implement the Batch Normalization regularization, or the dataset is too small.</p>
+<h2 id="ii.-uci-crime-dataset">II. UCI Crime Dataset</h2>
+<h3 id="data-preparation-1">Data preparation</h3>
+<p>Here the situation is different than before, because even if there are way more attributes, they have already been normalized between 0 and 1, and according to their mean.</p>
+<p>However, there are missing values, annotated by “?”. After trying several possibilities, I figured that the best way to process it is to replace all these missing values by “-1”. So, eventually, the model will learn to consider these values. Another way to proceed would be to assign the mean value to all missing ones, however the accuracy was lower when I tested it.</p>
+<p>There is nothing to do for the labels, are they are float numbers between 0 and 1.</p>
+<p>The function <em>split-data</em> first split the training data into a training set (4/5) and a testing set (1/5). Then, it split the training data again into a training set (4/5) and the validation set (1/5).</p>
+<h3 id="model-architecture-1">Model Architecture</h3>
+<p>The model architecture is :</p>
+<pre class=" language-python"><code class="prism  language-python">model <span class="token operator">=</span> models<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span><span class="token punctuation">)</span>  
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>  
+    layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">"relu"</span><span class="token punctuation">,</span> input_shape<span class="token operator">=</span><span class="token punctuation">(</span>train_data<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> kernel_regularizer<span class="token operator">=</span>dense_regularizer<span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token comment"># model.add(BatchNormalization())  </span>
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>Dropout<span class="token punctuation">(</span>drop<span class="token punctuation">)</span><span class="token punctuation">)</span>  
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">"relu"</span><span class="token punctuation">,</span> kernel_regularizer<span class="token operator">=</span>dense_regularizer<span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token comment"># model.add(BatchNormalization())  </span>
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>Dropout<span class="token punctuation">(</span>drop<span class="token punctuation">)</span><span class="token punctuation">)</span>  
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> kernel_regularizer<span class="token operator">=</span>dense_regularizer<span class="token punctuation">)</span><span class="token punctuation">)</span>  
+model<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span>optimizer<span class="token operator">=</span>opt<span class="token punctuation">,</span> loss<span class="token operator">=</span>loss_fct<span class="token punctuation">,</span> metrics<span class="token operator">=</span><span class="token punctuation">[</span>metric<span class="token punctuation">]</span><span class="token punctuation">)</span>
+</code></pre>
+<p>with, by default :</p>
+<pre class=" language-python"><code class="prism  language-python">seed <span class="token operator">=</span> <span class="token number">7</span>  
+loss_fct <span class="token operator">=</span> <span class="token string">"mse"</span>  
+opt <span class="token operator">=</span> <span class="token string">"rmsprop"</span>  
+metric <span class="token operator">=</span> <span class="token string">'mae'</span>  
+num_epochs <span class="token operator">=</span> <span class="token number">50</span>  
+batch_size <span class="token operator">=</span> <span class="token number">1</span>  
+dense_regularizer <span class="token operator">=</span> <span class="token boolean">None</span>
+drop <span class="token operator">=</span> <span class="token number">0</span>
+</code></pre>
+<h3 id="hyperparameter-tuning-1">HyperParameter tuning</h3>
+<h4 id="loss-functions-1">1.  loss functions</h4>
+<p>It is a model for single output regression, so the loss functions we can use are :<br>
+mean_absolute_error : L1<br>
+mean_squared_error : L2<br>
+logcosh : log-cosh<br>
+tf.losses.huber_loss : hubert</p>
+<p>Here are the results :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">L1</th>
+<th align="center">L2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/VxQqaAU.png.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/JWjNRpl.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">log-cosh</th>
+<th align="center">huber</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/4EflflQ.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/DDbuKqg.png.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>And the final mae by loss function :<br>
+mean_squared_error :  0.10046065195250474<br>
+mean_absolute_error   :   0.0931244062137174<br>
+logcosh   :   0.10108523902287678<br>
+huber  :   0.09639699566163427</p>
+<p>The final values does not change much, but the impact of the loss function on the graphs really is according to the theory :</p>
+<ul>
+<li>L1 loss curve decrease smoothly</li>
+<li>L2 decrease more, but more abruptly</li>
+<li>logcosh : decrease even more but even more abruptly</li>
+<li>huber is the same as log-cosh but smoother</li>
+</ul>
+<h4 id="optimizers-1">2.  optimizers</h4>
+<p>I decided to kept Huber loss as the loss function for the remaining tests.</p>
+<p>We have 4 different optimizers :<br>
+SGD<br>
+RMSProp<br>
+AdaGrad<br>
+Adam</p>
+<p>Here are the results :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">SGD</th>
+<th align="center">RMSProp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/kbtObLp.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/vP8Lrs8.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">AdaGrad</th>
+<th align="center">Adam</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/63rFpgw.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/ApK4c7D.png.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>And the final mae by optimizers :<br>
+SGD : 0.09763676524862974<br>
+RMSProp : 0.09987740052811404<br>
+AdaGrad : 0.10475323565280922<br>
+Adam : 0.09552480519798856</p>
+<p>We can notice :<br>
+TODO</p>
+<h4 id="regularization-l2-1">3.  Regularization l2</h4>
+<p>For the L2 reguralization, I tested with the values : 0.1, 0.01, 0.001, 0.0001</p>
+<p>Here are the results :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">L2(0.1)</th>
+<th align="center">L2(0.01)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/haaxkYq.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/b1VMIw6.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">L2(0.001)</th>
+<th align="center">L2(0.0001)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/OuZbv1P.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/BxZPvFH.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>And the final mae by value :<br>
+L2(0.1) : 0.17312735126450143<br>
+L2(0.01) : 0.12496511331032437<br>
+L2(0.001) :  0.09454084980100112<br>
+L2(0.0001) : 0.09426881752756416</p>
+<p>As expected, we can notice that the higher value of L2 are too high, introduce noice and lower the mae where the best value for L2 reguralization is 0.0001, as the curve is smooth and the final mae is the smallest. There is a small improvement from the precedent losses.</p>
+<h4 id="dropout-1">3.  Dropout</h4>
+<p>For the Dropout, I tested with the drop rate : 0.2, 0.3, 0.4, 0.5</p>
+<p>Here are the results :</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">Dropout(0.2)</th>
+<th align="center">Dropout(0.3)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/r7dw8fK.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/SEKAkuA.png" width="600px"></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">Dropout(0.4)</th>
+<th align="center">Dropout(0.5)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img src="https://imgur.com/xoXNr4V.png" width="600px"></td>
+<td align="center"><img src="https://imgur.com/UQHiFrs.png" width="600px"></td>
+</tr>
+</tbody>
+</table><p>And the final mae by drop rate :<br>
+DropOut 0.2 : 0.09813523426838802<br>
+DropOut 0.3 : 0.11199997028563652<br>
+DropOut 0.4 : 0.11976749522372099<br>
+DropOut 0.5 : 0.11228825491166974</p>
+<p>We can see that the best drop rate here is 20%. The curve is the smoothe and the final MAE is the smallest. However we can notice that the final mae is slighty superior that the one without regularization.</p>
+<h4 id="batch-normalization-1">4.  Batch Normalization</h4>
+<p>Here is a simplified version of my model architecture to show where the btach normalization is being done.</p>
+<pre class=" language-python"><code class="prism  language-python">model <span class="token operator">=</span> models<span class="token punctuation">.</span>Sequential<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">64</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token operator">-</span><span class="token operator">-</span><span class="token operator">&gt;</span> model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>BatchNormalization<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+<span class="token operator">-</span><span class="token operator">-</span><span class="token operator">&gt;</span> model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>BatchNormalization<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+
+model<span class="token punctuation">.</span>add<span class="token punctuation">(</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>  
+model<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span>optimizer<span class="token operator">=</span>opt<span class="token punctuation">,</span> loss<span class="token operator">=</span>loss_fct<span class="token punctuation">,</span> metrics<span class="token operator">=</span><span class="token punctuation">[</span>metric<span class="token punctuation">]</span><span class="token punctuation">)</span>
+</code></pre>
+<p>Result :<br>
+<img src="https://imgur.com/df6nAJm.png" alt=" BN "></p>
+<p>Final Mae : 71.12431900329352</p>
+<p>The final value is way to high. It may be cause the batches we are using a too small to implement the Batch Normalization regularization.</p>
+
+    </div>
+  </div>
+</body>
+
+</html>
