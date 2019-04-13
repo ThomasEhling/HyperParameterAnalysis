@@ -2,7 +2,7 @@
 Hyper parameters impact on a classifer and a regression model
 
 
-1) Simple classifer on the CIFAR10 dataset.
+# Simple classifer on the CIFAR10 dataset.
 
 Experiment the impact on the loss and accuracy by epoch for :
 
@@ -14,7 +14,7 @@ Experiment the impact on the loss and accuracy by epoch for :
   - Batch Normalization
   
   
-2) Simple Regression model on the UCI Crime dataset.
+# Simple Regression model on the UCI Crime dataset.
 
 Experiment the impact on the loss and accuracy by epoch for :
 
@@ -24,5 +24,6 @@ Experiment the impact on the loss and accuracy by epoch for :
   - L2 : 0.1, 0.01, 0.001, 0.0001
   - Dropout : 0.2, 0.3, 0.4, 0.5
   - Batch Normalization
-
-Please see the "src/hyper_parameters_analysis.pdf" or ".html" for the implementation and the results.
+  
+ # Implementation & results
+Please see the **"src/hyper_parameters_analysis.html"** or **".pdf"** for the implementation and the results.
