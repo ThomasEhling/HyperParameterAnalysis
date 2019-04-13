@@ -25,4 +25,4 @@ Experiment the impact on the loss and accuracy by epoch for :
   - Dropout : 0.2, 0.3, 0.4, 0.5
   - Batch Normalization
 
-Please see the "src/hyper_parameter_code.pdf" or ".html" for the implementation and the results.
+Please see the "src/hyper_parameters_analysis.pdf" or ".html" for the implementation and the results.
